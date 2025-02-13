@@ -14,11 +14,11 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user.username' => 'sometimes|string|max:50|unique:users,username',
-            'user.email' => 'sometimes|email|max:255|unique:users,email',
-            'user.password' => 'sometimes',
-            'user.image' => 'sometimes|url',
-            'user.bio' => 'sometimes|string|max:2048'
+            'user.username' => 'nullable|string|max:50|unique:users,username,' . auth()->user()->id,
+            'user.email' => 'nullable|email|max:255|unique:users,email,' . auth()->user()->id,
+            'user.password' => 'nullable',
+            'user.image' => 'nullable|url',
+            'user.bio' => 'nullable|string|max:2048'
         ];
     }
 }

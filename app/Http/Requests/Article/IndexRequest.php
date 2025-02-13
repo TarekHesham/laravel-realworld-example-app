@@ -14,11 +14,11 @@ class IndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tag' => 'sometimes|string',
-            'author' => 'sometimes|string',
-            'favorited' => 'sometimes|string',
-            'limit' => 'sometimes|integer',
-            'offset' => 'sometimes|integer'
+            'tag' => 'nullable|string',
+            'author' => 'nullable|string',
+            'favorited' => 'nullable|string',
+            'limit' => 'nullable|integer',
+            'offset' => 'nullable|integer'
         ];
     }
 }

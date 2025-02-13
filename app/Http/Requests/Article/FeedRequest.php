@@ -14,8 +14,8 @@ class FeedRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'limit' => 'sometimes|integer',
-            'offset' => 'sometimes|integer'
+            'limit' => 'nullable|integer',
+            'offset' => 'nullable|integer'
         ];
     }
 }
