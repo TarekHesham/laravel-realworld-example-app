@@ -41,11 +41,11 @@ class ArticleController extends Controller
         return $this->articleResponse($article);
     }
 
-    public function store(StoreRequest $request): ArticleResource
+    public function store(StoreRequest $request)
     {
         $article = auth()->user()->articles()->create($request->validated()['article']);
 
-        $this->syncTags($article);
+        $this->syncTags($article, $request->validated()['article']['tagList']);
 
         return $this->articleResponse($article);
     }
@@ -54,8 +54,8 @@ class ArticleController extends Controller
     {
         $article->update($request->validated()['article']);
 
-        $this->syncTags($article);
-
+        $this->syncTags($article, $request->validated()['article']['tagList']);
+    
         return $this->articleResponse($article);
     }
 
@@ -77,10 +77,10 @@ class ArticleController extends Controller
 
         return $this->articleResponse($article);
     }
-    
-    protected function syncTags(Article $article): void
+
+    protected function syncTags(Article $article, array $tags): void
     {
-        $this->articleService->syncTags($article, $this->request->validated()['article']['tagList'] ?? []);
+        $this->articleService->syncTags($article, $tags ?? []);
     }
 
     protected function articleResponse(Article $article): ArticleResource
