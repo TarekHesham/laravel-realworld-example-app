@@ -14,7 +14,7 @@ class Article extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'body'];
+    protected $fillable = ['title', 'description', 'body', 'slug'];
 
     public function getRouteKeyName(): string
     {
@@ -33,7 +33,7 @@ class Article extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'article_user', 'article_id', 'user_id');
     }
 
     public function comments(): HasMany
@@ -63,7 +63,6 @@ class Article extends Model
     public function setTitleAttribute(string $title): void
     {
         $this->attributes['title'] = $title;
-
         $this->attributes['slug'] = Str::slug($title);
     }
 }
