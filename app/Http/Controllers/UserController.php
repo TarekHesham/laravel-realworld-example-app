@@ -6,49 +6,52 @@ use App\Http\Requests\User\LoginRequest;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
-    protected User $user;
-
-    public function __construct(User $user)
+    public function show(): JsonResponse
     {
-        $this->user = $user;
+        return $this->userResponse(JWTAuth::getToken());
     }
 
-    public function show(): array
+    public function store(StoreRequest $request): JsonResponse
     {
-        return $this->userResponse(auth()->getToken()->get());
+        $user = User::create($request->validated()['user']);
+
+        $token = JWTAuth::fromUser($user);
+
+        return $this->userResponse($token);
     }
 
-    public function store(StoreRequest $request): array
-    {
-        $user = $this->user->create($request->validated()['user']);
-
-        auth()->login($user);
-
-        return $this->userResponse(auth()->refresh());
-    }
-
-    public function update(UpdateRequest $request): array
+    public function update(UpdateRequest $request): JsonResponse
     {
         auth()->user()->update($request->validated()['user']);
 
-        return $this->userResponse(auth()->getToken()->get());
+        return $this->userResponse(JWTAuth::getToken());
     }
 
-    public function login(LoginRequest $request): array
+    public function login(LoginRequest $request): JsonResponse
     {
-        if ($token = auth()->attempt($request->validated()['user'])) {
+        $credentials = $request->validated()['user'];
+
+        if ($token = JWTAuth::attempt($credentials)) {
             return $this->userResponse($token);
         }
 
-        abort(Response::HTTP_FORBIDDEN);
+        return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
     }
 
-    protected function userResponse(string $jwtToken): array
+    protected function userResponse(string|null $jwtToken): JsonResponse
     {
-        return ['user' => ['token' => $jwtToken] + auth()->user()->toArray()];
+        if (!$jwtToken) {
+            return response()->json(['error' => 'Token generation failed'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            'user' => ['token' => $jwtToken] + auth()->user()->toArray()
+        ]);
     }
 }
