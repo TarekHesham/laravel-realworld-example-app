@@ -30,7 +30,7 @@ class CommentController extends Controller
         return new CommentResource($comment);
     }
 
-    public function destroy(Article $article, Comment $comment, DestroyRequest $request): void
+    public function destroy(Comment $comment, DestroyRequest $request): void
     {
         $comment->delete();
     }
