@@ -6,15 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory;
 
-    protected $fillable = ['username', 'email', 'password', 'bio', 'images'];
+    protected $fillable = ['username', 'email', 'password', 'bio', 'image'];
 
-    protected $visible = ['username', 'email', 'bio', 'images'];
+    protected $hidden = ['password', 'remember_token'];
+
+    protected $visible = ['username', 'email', 'bio', 'image'];
 
     public function getRouteKeyName(): string
     {
@@ -23,7 +25,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function articles(): HasMany
     {
-        return $this->hasMany(Article::class);
+        return $this->hasMany(Article::class, 'user_id', 'id');
     }
 
     public function favoritedArticles(): BelongsToMany
